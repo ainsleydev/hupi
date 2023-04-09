@@ -40,6 +40,14 @@ dockers:
             - "--label=org.opencontainers.image.version={{.Version}}"
             - "--label=org.opencontainers.image.source=https://github.com/ainsleydev/hupi"
             - "--platform=linux/arm64"
+# Homebrew
+brews:
+    -   name: hupi
+        homepage: https://github.com/ainsleydev/hupi
+        tap:
+            owner: ainsleydev
+            name: hupi
+        license: "MIT"
 # Zip
 archives:
     -   builds:
