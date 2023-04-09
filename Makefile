@@ -12,7 +12,7 @@ build: # Build
 
 dist: # Creates and build dist folder
 	goreleaser check
-	goreleaser release --rm-dist --snapshot
+	goreleaser release --clean --snapshot
 .PHONY: dist
 
 generate: # Runs go generate
@@ -21,7 +21,6 @@ generate: # Runs go generate
 
 format: # Run gofmt
 	go fmt ./...
-	swag fmt
 .PHONY: format
 
 lint: # Run linter

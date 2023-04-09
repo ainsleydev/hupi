@@ -6,53 +6,54 @@ before:
         - make format
 # Main Build
 builds:
-    - id: "hupi"
-      env:
-          - CGO_ENABLED=0
-      goos:
-          - darwin
-          - linux
-          - windows
-      goarch:
-          - amd64
-          - arm64
-      binary: hupi
-      ignore:
-          - goos: windows
-            goarch: arm64
-      tags:
-          - prod
+    -   id: "hupi"
+        env:
+            - CGO_ENABLED=0
+        goos:
+            - darwin
+            - linux
+            - windows
+        goarch:
+            - amd64
+            - arm64
+        binary: hupi
+        ignore:
+            -   goos: windows
+                goarch: arm64
+        tags:
+            - prod
 # Docker
 dockers:
-    - id: hupi
-      goos: linux
-      goarch: arm64
-      ids:
-          - hupi
-      image_templates:
-          - "ghcr.io/ainsleydev/hupi:{{ .Version }}"
-      skip_push: false
-      dockerfile: ./docker/goreleaser.api.Dockerfile
-      build_flag_templates:
-          - "--label=org.opencontainers.image.created={{.Date}}"
-          - "--label=org.opencontainers.image.title={{.ProjectName}}"
-          - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-          - "--label=org.opencontainers.image.version={{.Version}}"
-          - "--label=org.opencontainers.image.source=https://github.com/ainsleydev/hupi"
-          - "--platform=linux/arm64"
+    -   id: hupi
+        goos: linux
+        goarch: arm64
+        ids:
+            - hupi
+        image_templates:
+            - "ghcr.io/ainsleydev/hupi:{{ .Version }}"
+        skip_push: false
+        dockerfile: Dockerfile
+        build_flag_templates:
+            - "--label=org.opencontainers.image.created={{.Date}}"
+            - "--label=org.opencontainers.image.title={{.ProjectName}}"
+            - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+            - "--label=org.opencontainers.image.version={{.Version}}"
+            - "--label=org.opencontainers.image.source=https://github.com/ainsleydev/hupi"
+            - "--platform=linux/arm64"
 # Zip
 archives:
-    - builds:
-          - hupi
-      format: tar.gz
-      format_overrides:
-          - goos: windows
-            format: zip
-      name_template: "hupi_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-      wrap_in_directory: "hupi"
-      files:
-          - README.md
-          - LICENSE
+    -   builds:
+            - hupi
+        rlcp: true
+        format: tar.gz
+        format_overrides:
+            -   goos: windows
+                format: zip
+        name_template: "hupi_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+        wrap_in_directory: "hupi"
+        files:
+            - README.md
+            - LICENSE
 checksum:
     name_template: 'checksums.txt'
     algorithm: sha256
