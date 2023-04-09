@@ -1,0 +1,23 @@
+run:
+    go: '1.20'
+    skip-dirs:
+        - res
+linters:
+    enable:
+        - gofmt
+        - govet
+        - gocyclo
+        - ineffassign
+        - thelper
+        - tparallel
+        - unconvert
+        - unparam
+        - wastedassign
+        - revive
+linters-settings:
+    tagliatelle:
+        case:
+            use-field-name: false
+            rules:
+                yaml: snake
+                json: snake

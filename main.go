@@ -47,7 +47,6 @@ func main() {
 	}()
 
 	cmd := exec.Command("hugo", "server", "--quiet", "--disableFastRender")
-	//mw := io.MultiWriter(os.Stdout, &tmp)
 	stdOut, _ := cmd.StdoutPipe()
 	cmd.Start()
 
@@ -58,15 +57,4 @@ func main() {
 		fmt.Println(m)
 	}
 	cmd.Wait()
-	//var stdBuffer bytes.Buffer
-
-	//var stdBuffer t
-	//
-	//cmd.Stdout = mw
-	//cmd.Stderr = mw
-	//
-	// Execute the command
-	//if err := cmd.Run(); err != nil {
-	//	log.Panic(err)
-	//}
 }
