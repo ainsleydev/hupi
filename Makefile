@@ -1,45 +1,73 @@
-# Setup
-setup:
+setup: # Setup dependencies
 	go mod tidy
 .PHONY: setup
 
-# Run gofmt
-format:
+run: # Run
+	go run main.go
+.PHONY: run
+
+build: # Build
+	go build -o hupi
+.PHONY: build
+
+dist: # Creates and build dist folder
+	goreleaser check
+	goreleaser release --rm-dist --snapshot
+.PHONY: dist
+
+generate: # Runs go generate
+	go generate ./...
+.PHONY: generate
+
+format: # Run gofmt
 	go fmt ./...
+	swag fmt
 .PHONY: format
 
-# Run linter
-lint:
+lint: # Run linter
 	golangci-lint run ./...
 .PHONY: lint
 
-# Test uses race and coverage
-test:
-	go clean -testcache && go test -race $$(go list ./... | grep -v tests | grep -v mocks) -coverprofile=coverage.out -covermode=atomic
+excluded := grep -v /res/ | grep -v /mocks/
+
+test: # Test uses race and coverage
+	go clean -testcache && go test -race $$(go list ./... | $(excluded)) -coverprofile=coverage.out -covermode=atomic
 .PHONY: test
 
-# Test with -v
-test-v:
-	go clean -testcache && go test -race -v $$(go list ./... | grep -v tests | grep -v mocks) -coverprofile=coverage.out -covermode=atomic
+test-v: # Test with -v
+	go clean -testcache && go test -race -v $$(go list ./... | $(excluded)) -coverprofile=coverage.out -covermode=atomic
 .PHONY: test-v
 
-# Run all the tests and opens the coverage report
-cover: test
-	go tool cover -html=coverage.out
-.PHONY: cover
-
-# Make mocks keeping directory tree
-mocks:
+mocks: # Make mocks keeping directory tree
 	rm -rf internal/mocks && mockery --all --keeptree --output ./internal/mocks
 .PHONY: mocks
 
-# Run go doc
-doc:
+doc: # Run go doc
 	godoc -http localhost:8080
 .PHONY: doc
 
-# Make format, lint and test
-all:
+all: # Make format, lint and test
 	$(MAKE) format
 	$(MAKE) lint
 	$(MAKE) test
+.PHONY: all
+
+todo: # Show to-do items per file
+	$(Q) grep \
+		--exclude=Makefile.util \
+		--exclude-dir=vendor \
+		--exclude-dir=.idea \
+		--text \
+		--color \
+		-nRo \
+		-E '\S*[^\.]TODO.*' \
+		.
+.PHONY: todo
+
+lines: # Show line count of Go code
+	find . -name '*.go' | xargs wc -l
+.PHONY: lines
+
+help: # Display this help
+	$(Q) awk 'BEGIN {FS = ":.*#"; printf "Usage: make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?#/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+.PHONY: help
