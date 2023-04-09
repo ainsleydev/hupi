@@ -43,3 +43,10 @@ type (
 		} `json:"media"`
 	}
 )
+
+func (e Event) Fields() map[string]any {
+	return map[string]any{
+		"event": e.Event,
+		"model": e.Model,
+	}
+}

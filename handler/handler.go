@@ -16,20 +16,14 @@ package handler
 import (
 	"encoding/json"
 	"github.com/ainsleyclark/errors"
-	"github.com/ainsleydev/hupi/hugo"
 	"github.com/ainsleydev/hupi/logger"
 	"github.com/ainsleydev/hupi/strapi"
 	"io"
 	"net/http"
 )
 
-// Webhook TODO - handles the webhook request.
-type Webhook struct {
-	hugo hugo.Hugo
-}
-
 // Handle TODO - handles the request.
-func (h Webhook) Handle(w http.ResponseWriter, r *http.Request) {
+func (s Server) Handle(w http.ResponseWriter, r *http.Request) {
 	const op = "TODO.Handle"
 
 	defer r.Body.Close()
@@ -50,7 +44,7 @@ func (h Webhook) Handle(w http.ResponseWriter, r *http.Request) {
 	logger.WithField("body", string(buf)).Trace("Received request")
 	logger.Info("Rebuilding Hugo...")
 
-	err = h.hugo.Rebuild()
+	err = s.hugo.Rebuild()
 	if err != nil {
 		logger.WithError(err).Error()
 	}

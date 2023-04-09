@@ -56,6 +56,11 @@ func (c Client) Server(args []string) error {
 	return nil
 }
 
+func (c Client) Build() error {
+	const op = "Hugo.Build"
+	return nil
+}
+
 // Rebuild rebuilds the Hugo site.
 func (c Client) Rebuild() error {
 	const op = "Hugo.Rebuild"

@@ -11,18 +11,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package handler
 
 import (
-	"github.com/ainsleydev/hupi/logger"
-	"github.com/ainsleydev/hupi/strapi"
+	"github.com/ainsleyclark/errors"
+	"github.com/ainsleydev/hupi/hugo"
+	"net/http"
 )
 
-func main() {
-	logger.Bootstrap("hupi")
+// Server TODO - handles the webhook request.
+type Server struct {
+	hugo hugo.Hugo
+}
 
-	e := strapi.Event{
-		Event: "test",
+func (s Server) ListenAndServe(port string) error {
+	const op = "Server.ListenAndServe"
+	http.HandleFunc("/rebuild", s.Handle)
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		return errors.NewInternal(err, "Failed to start server", op)
 	}
-	logger.Info(e.Fields())
+	return nil
 }
