@@ -24,3 +24,9 @@ credentials.md
 
 # System Files
 .DS_Store
+
+# Artifacts
+dist
+dist/*
+./dist
+./dist/*
