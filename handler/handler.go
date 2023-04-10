@@ -14,39 +14,33 @@
 package handler
 
 import (
-	"encoding/json"
 	"github.com/ainsleyclark/errors"
 	"github.com/ainsleydev/hupi/logger"
 	"github.com/ainsleydev/hupi/strapi"
-	"io"
-	"net/http"
+	"github.com/labstack/echo/v4"
 )
 
-// Handle TODO - handles the request.
-func (s Server) Handle(w http.ResponseWriter, r *http.Request) {
-	const op = "TODO.Handle"
+// HandleStrapiWebhook handles the incoming webhook from Strapi and rebuilds
+// Hugo when it encounters any change within Strapi.
+func (s Server) HandleStrapiWebhook(ctx echo.Context) error {
+	const op = "Server.HandleStrapiWebhook"
 
-	defer r.Body.Close()
-	buf, err := io.ReadAll(r.Body)
-	if err != nil {
-		logger.WithError(errors.NewInternal(err, "Failed to read response body", op)).Error()
-		return
-	}
+	logger.Trace("Received Strapi request")
 
 	var entry = strapi.Entry{}
-	err = json.Unmarshal(buf, &entry)
+	err := ctx.Bind(&entry)
 	if err != nil {
-		logger.WithError(errors.NewInternal(err, "Failed to unmarshal response body", op)).Error()
-		return
+		return errors.NewInternal(err, "Failed to bind to response body", op)
 	}
 
-	logger.WithField("body", string(buf)).Trace("Received request")
 	logger.Info("Rebuilding Hugo...")
 
-	err = s.hugo.Rebuild()
+	err = s.Hugo.Rebuild()
 	if err != nil {
-		logger.WithError(err).Error()
+		return err
 	}
 
 	logger.Info("Rebuild complete")
+
+	return nil
 }

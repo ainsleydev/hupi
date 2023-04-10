@@ -37,8 +37,8 @@ test-v: # Test with -v
 	go clean -testcache && go test -race -v $$(go list ./... | $(excluded)) -coverprofile=coverage.out -covermode=atomic
 .PHONY: test-v
 
-mocks: # Make mocks keeping directory tree
-	rm -rf internal/mocks && mockery --all --keeptree --output ./internal/mocks
+mock: # Make mocks keeping directory tree
+	rm -rf internal/mocks && mockery --all --output ./internal/mocks
 .PHONY: mocks
 
 doc: # Run go doc

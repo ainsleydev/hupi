@@ -20,7 +20,6 @@ import (
 	"github.com/ainsleydev/hupi/version"
 	"github.com/enescakir/emoji"
 	"github.com/urfave/cli/v2"
-	"log"
 	"os"
 )
 
@@ -54,7 +53,7 @@ func Run() {
 	}
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err)
 	}
 }
 

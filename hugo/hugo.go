@@ -28,7 +28,6 @@ type (
 	}
 	Client struct {
 		BuildDirectory string
-		Runner         execute.Runner
 	}
 )
 

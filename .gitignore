@@ -9,6 +9,7 @@
 *.dll
 *.so
 *.dylib
+./hupi
 
 # Test binary, built with `go test -c`
 *.test

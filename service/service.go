@@ -26,6 +26,16 @@ type App struct {
 	Strapi *strapi.Client
 }
 
+func New(hugoBuildDir string) *App {
+	return &App{
+		Hugo: hugo.Client{
+			BuildDirectory: hugoBuildDir,
+		},
+		Server: handler.Server{},
+		Strapi: nil,
+	}
+}
+
 type DevelopConfig struct {
 	HugoBuildDirectory string
 	HugoPort           string
@@ -39,7 +49,7 @@ func (a App) Develop() error {
 }
 
 var CliCommands = []string{
-	"hugo-port",
+	"hugoPort",
 	"hugo-build-directory",
 	"strapi-enable",
 	"strapi-no-build",

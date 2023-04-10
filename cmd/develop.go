@@ -14,12 +14,10 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/ainsleydev/hupi/handler"
-	"github.com/ainsleydev/hupi/hugo"
-	"github.com/ainsleydev/hupi/service"
 	"github.com/ainsleydev/hupi/strapi"
 	"github.com/urfave/cli/v2"
-	"strings"
 )
 
 // developCommand is the command to start the Hugo server and
@@ -32,73 +30,75 @@ var developCommand = &cli.Command{
 	SkipFlagParsing: true,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:     "hugo-port",
-			Value:    "5000",
+			Name:     "hugoPort",
 			Usage:    "Port on which the Hugo server will listen on.",
+			Value:    "5001",
 			Required: false,
 		},
 		&cli.StringFlag{
-			Name:     "hugo-build-directory",
+			Name:     "hugoBuildDirectory",
 			Value:    "prebuild",
 			Usage:    "Determines the directory in which Hupi will build content.",
 			Required: false,
 		},
 		&cli.BoolFlag{
-			Name:     "strapi-enable",
+			Name:     "strapiEnable",
 			Value:    false,
 			Usage:    "When enabled, Hupi will run Strapi develop.",
 			Required: false,
 		},
 		&cli.BoolFlag{
-			Name:     "strapi-no-build",
+			Name:     "strapiNoBuild",
 			Value:    false,
 			Usage:    "Starts Strapi with autoReload enabled and skip the administration panel build process.",
 			Required: false,
 		},
 		&cli.BoolFlag{
-			Name:     "strapi-watch-admin",
+			Name:     "strapiWatchAdmin",
 			Value:    false,
 			Usage:    "Starts Strapi with autoReload enabled and the front-end development server. It allows you to customize the administration panel.",
 			Required: false,
 		},
 	},
 	Action: func(ctx *cli.Context) error {
-		enableStrapi := ctx.Bool("strapi-enable")
+		enableStrapi := ctx.Bool("strapiEnable")
 		if enableStrapi {
 			_ = strapi.Client{
-				NoBuild:    ctx.Bool("strapi-no-build"),
-				WatchAdmin: ctx.Bool("strapi-watch-admin"),
+				NoBuild:    ctx.Bool("strapiNoBuild"),
+				WatchAdmin: ctx.Bool("strapiWatchAdmin"),
 			}
 		}
 
-		hu := hugo.Client{
-			BuildDirectory: ctx.String("hugo-build-directory"),
+		//hu := hugo.Client{
+		//	BuildDirectory: ctx.String("hugoBuildDirectory"),
+		//}
+		handle := handler.Server{
+			Addr: ctx.String("hugoPort"),
 		}
+		fmt.Println(ctx.String("hugoPort"))
 
-		handle := handler.Server{}
 		go func() {
-			err := handle.ListenAndServe(ctx.String("hugo-port"))
-			if err != nil {
-				return
-			}
+
 		}()
 
-		var hugoArgs []string
-		args := ctx.Args().Slice()
-	Outer:
-		for _, arg := range args {
-			for _, cliArg := range service.CliCommands {
-				if strings.Contains(arg, cliArg) {
-					continue Outer
-				}
-				hugoArgs = append(hugoArgs, arg)
-			}
-		}
+		//	var hugoArgs []string
+		//	args := ctx.Args().Slice()
+		//Outer:
+		//	for _, arg := range args {
+		//		for _, cliArg := range service.CliCommands {
+		//			if strings.Contains(arg, cliArg) {
+		//				continue Outer
+		//			}
+		//			hugoArgs = append(hugoArgs, arg)
+		//		}
+		//	}
 
-		err := hu.Server(hugoArgs)
-		if err != nil {
-			return err
-		}
+		//err := hu.Server(hugoArgs)
+		//if err != nil {
+		//	return err
+		//}
+
+		handle.ListenAndServe()
 
 		return nil
 	},
