@@ -11,10 +11,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cmd
 
-import "github.com/ainsleydev/hupi/cmd"
+import "github.com/urfave/cli/v2"
 
-func main() {
-	cmd.Run()
+var buildCommand = &cli.Command{
+	Name: "build",
+	Aliases: []string{
+		"b",
+	},
+	SkipFlagParsing: true,
+	Action: func(ctx *cli.Context) error {
+		return nil
+	},
 }

@@ -27,7 +27,6 @@ func (s Server) Handle(w http.ResponseWriter, r *http.Request) {
 	const op = "TODO.Handle"
 
 	defer r.Body.Close()
-
 	buf, err := io.ReadAll(r.Body)
 	if err != nil {
 		logger.WithError(errors.NewInternal(err, "Failed to read response body", op)).Error()

@@ -21,8 +21,10 @@ import (
 )
 
 type (
+	// Hugo - TODO
 	Hugo interface {
 		Server(args []string) error
+		Build(args []string) error
 		Rebuild() error
 	}
 	Client struct {
@@ -38,7 +40,7 @@ func (c Client) Server(args []string) error {
 
 	err := cmd.Start()
 	if err != nil {
-		return err
+		return errors.NewInvalid(err, "Failed to start Hugo server", op)
 	}
 
 	scanner := bufio.NewScanner(stdOut)
@@ -50,14 +52,21 @@ func (c Client) Server(args []string) error {
 
 	err = cmd.Wait()
 	if err != nil {
-		return err
+		return errors.NewInvalid(err, "Failed to start Hugo server", op)
 	}
 
 	return nil
 }
 
-func (c Client) Build() error {
+func (c Client) Build(args []string) error {
 	const op = "Hugo.Build"
+
+	cmd := exec.Command("hugo", args...)
+	_, err := cmd.StdoutPipe()
+	if err != nil {
+		return errors.NewInternal(err, "Failed build Hugo", op)
+	}
+
 	return nil
 }
 

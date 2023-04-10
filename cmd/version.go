@@ -11,10 +11,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cmd
 
-import "github.com/ainsleydev/hupi/cmd"
+import (
+	"fmt"
+	"github.com/ainsleydev/hupi/version"
+	"github.com/urfave/cli/v2"
+)
 
-func main() {
-	cmd.Run()
+// versionCommand is the command to print out the version
+// number of the application.
+var versionCommand = &cli.Command{
+	Name: "version",
+	Aliases: []string{
+		"v",
+	},
+	Action: func(ctx *cli.Context) error {
+		fmt.Printf("v%s\n", version.Version)
+		return nil
+	},
 }

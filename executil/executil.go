@@ -11,10 +11,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package executil
 
-import "github.com/ainsleydev/hupi/cmd"
+import "os/exec"
 
-func main() {
-	cmd.Run()
+// as util
+func commandExists(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
 }

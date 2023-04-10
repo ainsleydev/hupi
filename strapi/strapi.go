@@ -13,9 +13,18 @@
 
 package strapi
 
-import "time"
+import (
+	"github.com/ainsleyclark/errors"
+	"log"
+	"os/exec"
+	"time"
+)
 
 type (
+	Client struct {
+		NoBuild    bool
+		WatchAdmin bool
+	}
 	Event struct {
 		Event     string    `json:"event"`
 		CreatedAt time.Time `json:"createdAt"`
@@ -43,6 +52,30 @@ type (
 		} `json:"media"`
 	}
 )
+
+func (c Client) Start() error {
+	const op = "Strapi.Start"
+
+	var args []string
+
+	if c.WatchAdmin {
+		args = append(args, "--no-build")
+	}
+
+	if c.WatchAdmin {
+		args = append(args, "--watch-admin")
+	}
+
+	cmd := exec.Command("strapi", append(args, "develop")...)
+	out, err := cmd.Output()
+	if err != nil {
+		return errors.NewInternal(err, "Failed to start Strapi", op)
+	}
+
+	log.Println(out)
+
+	return nil
+}
 
 func (e Event) Fields() map[string]any {
 	return map[string]any{

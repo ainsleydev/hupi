@@ -11,10 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package version
 
-import "github.com/ainsleydev/hupi/cmd"
-
-func main() {
-	cmd.Run()
-}
+// Version is the application version number that is being run.
+var Version = "0.0.0"
