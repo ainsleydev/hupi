@@ -35,7 +35,7 @@ type (
 func (c Client) Server(args []string) error {
 	const op = "Hugo.Server"
 
-	cmd := exec.Command("hugo", append(args, "server")...)
+	cmd := exec.Command("hugo", append(args, "server", "--clock=TEMP")...)
 	stdOut, _ := cmd.StdoutPipe()
 
 	err := cmd.Start()
