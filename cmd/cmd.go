@@ -18,6 +18,7 @@ import (
 	"github.com/ainsleyclark/errors"
 	"github.com/ainsleydev/hupi/logger"
 	"github.com/ainsleydev/hupi/version"
+	"github.com/enescakir/emoji"
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"
@@ -32,7 +33,8 @@ func Run() {
 		Flags:                nil,
 		EnableBashCompletion: true,
 		Before: func(ctx *cli.Context) error {
-			logger.Bootstrap("hupi")
+			logger.Bootstrap("HUPI")
+			fmt.Printf("%v Welcome to Hupi\n\n", emoji.WavingHand)
 			return nil
 		},
 		Authors: []*cli.Author{
@@ -57,6 +59,9 @@ func Run() {
 }
 
 func PrintError(err error) {
+	if err == nil {
+		return
+	}
 	e := errors.ToError(err)
 	logger.Error(fmt.Sprintf("<%s> %s - %s",
 		e.Code,

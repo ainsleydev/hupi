@@ -11,12 +11,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package executil
+package execute
 
-import "os/exec"
+import (
+	"io"
+	"os/exec"
+)
 
-// as util
-func commandExists(cmd string) bool {
-	_, err := exec.LookPath(cmd)
+type (
+	Runner interface {
+		Run() error
+	}
+	Task struct {
+		Command string
+		Args    []string
+		Dir     string
+		StdOut  io.Writer
+		StdErr  io.Writer
+	}
+)
+
+func (t Task) Run() error {
+	cmd := exec.Command(t.Command, t.Args...)
+	cmd.Dir = t.Dir
+
+	r, w := io.Pipe()
+	cmd.Stdin = r
+	cmd.Stdout = io.MultiWriter(w, t.StdOut)
+	cmd.Stderr = io.MultiWriter(w, t.StdErr)
+
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	return cmd.Wait()
+}
+
+func CommandExists(command string) bool {
+	_, err := exec.LookPath(command)
 	return err == nil
 }

@@ -12,3 +12,13 @@
 // limitations under the License.
 
 package hugo
+
+import "fmt"
+
+type hugoWriter struct {
+}
+
+func (h hugoWriter) Write(p []byte) (n int, err error) {
+	fmt.Print(string(p))
+	return len(p), nil
+}

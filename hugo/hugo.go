@@ -14,12 +14,9 @@
 package hugo
 
 import (
-	"bufio"
-	"bytes"
-	"fmt"
 	"github.com/ainsleyclark/errors"
-	"os/exec"
-	"strings"
+	"github.com/ainsleydev/hupi/execute"
+	"path/filepath"
 )
 
 type (
@@ -31,36 +28,22 @@ type (
 	}
 	Client struct {
 		BuildDirectory string
+		Runner         execute.Runner
 	}
 )
 
 func (c Client) Server(args []string) error {
 	const op = "Hugo.Server"
 
-	cmd := exec.Command("hugo", append(args, "server", "--clock=TEMP")...)
-	stdOut, err := cmd.StdoutPipe()
+	out := &hugoWriter{}
+	err := execute.Task{
+		Command: "hugo",
+		Args:    append(args, "server"),
+		StdOut:  out,
+		StdErr:  out,
+	}.Run()
 	if err != nil {
-		return err
-	}
-
-	buf := bytes.Buffer{}
-	cmd.Stderr = &buf
-
-	err = cmd.Start()
-	if err != nil {
-		return errors.NewInvalid(errors.New(strings.ReplaceAll(buf.String(), "\n", "")), "Failed to start Hugo server", op)
-	}
-
-	scanner := bufio.NewScanner(stdOut)
-	scanner.Split(bufio.ScanLines)
-	for scanner.Scan() {
-		m := scanner.Text()
-		fmt.Println(m)
-	}
-
-	err = cmd.Wait()
-	if err != nil {
-		return errors.NewInvalid(errors.New(strings.ReplaceAll(buf.String(), "\n", "")), "Failed to start Hugo server", op)
+		return errors.NewInternal(err, "Failed to start Hugo server", op)
 	}
 
 	return nil
@@ -69,8 +52,10 @@ func (c Client) Server(args []string) error {
 func (c Client) Build(args []string) error {
 	const op = "Hugo.Build"
 
-	cmd := exec.Command("hugo", args...)
-	_, err := cmd.StdoutPipe()
+	err := execute.Task{
+		Command: "hugo",
+		Args:    args,
+	}.Run()
 	if err != nil {
 		return errors.NewInternal(err, "Failed build Hugo", op)
 	}
@@ -84,12 +69,18 @@ func (c Client) Rebuild() error {
 
 	err := c.clean()
 	if err != nil {
-		return errors.NewInternal(err, "Could not clean public folder", op)
+		return errors.NewInternal(err, "Failed to clean public folder", op)
 	}
 
-	cmd := exec.Command("hugo", "--cleanDestinationDir")
-	cmd.Dir = c.BuildDirectory
-	_, err = cmd.Output()
+	err = execute.Task{
+		Command: "hugo",
+		Dir:     c.BuildDirectory,
+		Args: []string{
+			"--cleanDestinationDir",
+		},
+		StdOut: nil,
+		StdErr: nil,
+	}.Run()
 	if err != nil {
 		return errors.NewInternal(err, "Failed to rebuild Hugo", op)
 	}
@@ -98,11 +89,13 @@ func (c Client) Rebuild() error {
 }
 
 func (c Client) clean() error {
-	// TODO, we need to pass the public folder dynamically here.
-	cmd := exec.Command("rm", "-rf", "./prebuild/public")
-	_, err := cmd.Output()
-	if err != nil {
-		return err
-	}
-	return nil
+	return execute.Task{
+		Command: "rm",
+		Args: []string{
+			"rf",
+			filepath.Join(c.BuildDirectory, "public"),
+		},
+		StdOut: nil,
+		StdErr: nil,
+	}.Run()
 }
