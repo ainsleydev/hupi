@@ -20,32 +20,47 @@ import (
 	"strings"
 )
 
-type App struct {
-	Hugo   hugo.Hugo
-	Server handler.Server
-	Strapi *strapi.Client
-}
+type (
+	Develop struct {
+		Hugo   hugo.Hugo
+		Server handler.Server
+		Strapi *strapi.Client
+		Config DevelopConfig
+	}
+	DevelopConfig struct {
+		Args               []string
+		HugoPort           string
+		HugoBuildDirectory string
+		StrapiEnable       bool
+		StrapiNoBuild      bool
+		StrapiWatchAdmin   bool
+	}
+)
 
-func New(hugoBuildDir string) *App {
-	return &App{
-		Hugo: hugo.Client{
-			BuildDirectory: hugoBuildDir,
+// NewDevelop creates a new develop type that is used for
+// dev environments.
+func NewDevelop(config DevelopConfig) *Develop {
+	h := hugo.Client{
+		BuildDirectory: config.HugoBuildDirectory,
+	}
+	return &Develop{
+		Hugo: h,
+		Server: handler.Server{
+			Addr: config.HugoPort,
 		},
-		Server: handler.Server{},
 		Strapi: nil,
+		Config: config,
 	}
 }
 
-type DevelopConfig struct {
-	HugoBuildDirectory string
-	HugoPort           string
-	StrapiEnable       bool
-	StrapiNoBuild      bool
-	StrapiWatchAdmin   bool
-}
-
-func (a App) Develop() error {
-	return a.Hugo.Server(nil)
+func (d Develop) Develop() error {
+	go func() {
+		d.Server.ListenAndServe()
+	}()
+	if d.Config.StrapiEnable {
+		// Enable strapi
+	}
+	return d.Hugo.Server(getHugoArgs(d.Config.Args))
 }
 
 var CliCommands = []string{

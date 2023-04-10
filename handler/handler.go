@@ -25,7 +25,7 @@ import (
 func (s Server) HandleStrapiWebhook(ctx echo.Context) error {
 	const op = "Server.HandleStrapiWebhook"
 
-	logger.Trace("Received Strapi request")
+	logger.Debug("Received Strapi request")
 
 	var entry = strapi.Entry{}
 	err := ctx.Bind(&entry)

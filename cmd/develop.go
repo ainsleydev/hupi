@@ -14,9 +14,7 @@
 package cmd
 
 import (
-	"fmt"
-	"github.com/ainsleydev/hupi/handler"
-	"github.com/ainsleydev/hupi/strapi"
+	"github.com/ainsleydev/hupi/service"
 	"github.com/urfave/cli/v2"
 )
 
@@ -61,45 +59,14 @@ var developCommand = &cli.Command{
 		},
 	},
 	Action: func(ctx *cli.Context) error {
-		enableStrapi := ctx.Bool("strapiEnable")
-		if enableStrapi {
-			_ = strapi.Client{
-				NoBuild:    ctx.Bool("strapiNoBuild"),
-				WatchAdmin: ctx.Bool("strapiWatchAdmin"),
-			}
-		}
-
-		//hu := hugo.Client{
-		//	BuildDirectory: ctx.String("hugoBuildDirectory"),
-		//}
-		handle := handler.Server{
-			Addr: ctx.String("hugoPort"),
-		}
-		fmt.Println(ctx.String("hugoPort"))
-
-		go func() {
-
-		}()
-
-		//	var hugoArgs []string
-		//	args := ctx.Args().Slice()
-		//Outer:
-		//	for _, arg := range args {
-		//		for _, cliArg := range service.CliCommands {
-		//			if strings.Contains(arg, cliArg) {
-		//				continue Outer
-		//			}
-		//			hugoArgs = append(hugoArgs, arg)
-		//		}
-		//	}
-
-		//err := hu.Server(hugoArgs)
-		//if err != nil {
-		//	return err
-		//}
-
-		handle.ListenAndServe()
-
+		service.NewDevelop(service.DevelopConfig{
+			Args:               ctx.Args().Slice(),
+			HugoPort:           ctx.String("hugoPort"),
+			HugoBuildDirectory: ctx.String("hugoBuildDirectory"),
+			StrapiEnable:       ctx.Bool("strapiEnable"),
+			StrapiNoBuild:      ctx.Bool("strapiNoBuild"),
+			StrapiWatchAdmin:   ctx.Bool("strapiWatchAdmin"),
+		}).Develop()
 		return nil
 	},
 }
