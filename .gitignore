@@ -9,7 +9,6 @@
 *.dll
 *.so
 *.dylib
-./hupi
 
 # Test binary, built with `go test -c`
 *.test
@@ -40,6 +39,10 @@ dist
 dist/*
 ./dist
 ./dist/*
+
+# Hupi Specific
+./hupi
+hupi
 
 # Coverage
 coverage.out
