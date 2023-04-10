@@ -14,6 +14,8 @@
 package cmd
 
 import (
+	"fmt"
+	"github.com/ainsleyclark/errors"
 	"github.com/ainsleydev/hupi/logger"
 	"github.com/ainsleydev/hupi/version"
 	"github.com/urfave/cli/v2"
@@ -43,9 +45,22 @@ func Run() {
 			versionCommand,
 			developCommand,
 		},
+		ExitErrHandler: func(ctx *cli.Context, err error) {
+			PrintError(err)
+			os.Exit(0)
+		},
 	}
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+func PrintError(err error) {
+	e := errors.ToError(err)
+	logger.Error(fmt.Sprintf("<%s> %s - %s",
+		e.Code,
+		e.Message,
+		e.Err,
+	))
 }

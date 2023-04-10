@@ -15,9 +15,11 @@ package hugo
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/ainsleyclark/errors"
 	"os/exec"
+	"strings"
 )
 
 type (
@@ -36,11 +38,17 @@ func (c Client) Server(args []string) error {
 	const op = "Hugo.Server"
 
 	cmd := exec.Command("hugo", append(args, "server", "--clock=TEMP")...)
-	stdOut, _ := cmd.StdoutPipe()
-
-	err := cmd.Start()
+	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
-		return errors.NewInvalid(err, "Failed to start Hugo server", op)
+		return err
+	}
+
+	buf := bytes.Buffer{}
+	cmd.Stderr = &buf
+
+	err = cmd.Start()
+	if err != nil {
+		return errors.NewInvalid(errors.New(strings.ReplaceAll(buf.String(), "\n", "")), "Failed to start Hugo server", op)
 	}
 
 	scanner := bufio.NewScanner(stdOut)
@@ -52,7 +60,7 @@ func (c Client) Server(args []string) error {
 
 	err = cmd.Wait()
 	if err != nil {
-		return errors.NewInvalid(err, "Failed to start Hugo server", op)
+		return errors.NewInvalid(errors.New(strings.ReplaceAll(buf.String(), "\n", "")), "Failed to start Hugo server", op)
 	}
 
 	return nil

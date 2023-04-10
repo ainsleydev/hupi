@@ -14,7 +14,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/ainsleydev/hupi/handler"
 	"github.com/ainsleydev/hupi/hugo"
 	"github.com/ainsleydev/hupi/service"
@@ -98,7 +97,6 @@ var developCommand = &cli.Command{
 
 		err := hu.Server(hugoArgs)
 		if err != nil {
-			fmt.Println("gdg", err.Error())
 			return err
 		}
 
